@@ -1,28 +1,17 @@
 use clap::Parser;
+use http_health_checker::app::cli::errors::UrlParseErr;
+use http_health_checker::app::cli::functionality::url_health_check::check_url_in_loop;
 use http_health_checker::app::cli::layout::CliHttpHealthChecker;
+use std::time::Duration;
 use url::Url;
-use url::UrlParser;
 
-#[tokio::main(flavor = "current_thread")]
-async fn main() {
+fn main() {
     let cli = CliHttpHealthChecker::parse();
-    let timeout = cli.freq;
+    let timeout = Duration::from_secs(cli.timeout as _);
     let url: &str = &cli.url;
 
-    let _url_check = Url::parse(url);
-    if _url_check.is_err() {
-        println!("URL parsing error")
-    }
-
-    while _url_check.is_ok() {
-        print!("Checking '{url}'.");
-        let resp = reqwest::get(url).await.unwrap();
-        if resp.status().is_success() {
-            print!("Result: OK(200)\n");
-        } else {
-            print!("Result: ERR({})\n", resp.status().as_u16());
-        }
-
-        tokio::time::sleep(std::time::Duration::from_secs(timeout as _)).await;
+    match Url::parse(url).is_ok() {
+        true => check_url_in_loop(url, timeout),
+        false => println!("Error: {UrlParseErr}"),
     }
 }

@@ -4,15 +4,18 @@ version = "0.1.0"
 edition = "2021"
 
 [[bin]]
-name = "hash_finder_cli"
+name = "http_health_checker"
 path = "src/bin/cli.rs"
-
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-reqwest = "0.11.22"
-tokio = {version = "1.34.0", features = ["macros", "rt"]}
-url = "*"
-clap = { version = "4.4.6", features = ["derive"] }
+# [Net]
+reqwest = { version = "0.11.22", features = ["blocking"] }
+url = "2.4.1"
 
+# [CLI]
+clap = { version = "4.4.8", features = ["derive"] }
+
+# [Errors]
+thiserror = "1.0.50"
